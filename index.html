@@ -215,6 +215,7 @@
         });
 
         function analyzeKanji(text) {
+            text = text.normalize('NFKC'); // CJK互換漢字（U+F900–U+FAFF）をCJK統合漢字に正規化
             // \p{Script=Han} で「漢字」プロパティを持つすべての文字にマッチさせます。
 　　　　　　 // ※この記法を使用する場合、末尾の 'u' (unicode) フラグが必須です。
             const kanjiRegex = /\p{Script=Han}/gu;
