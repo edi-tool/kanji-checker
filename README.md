@@ -8,6 +8,26 @@ https://edi-tool.github.io/kanji-checker/
 文化庁の常用漢字表に基づき、漢字の習得学年を特定します。
 執筆や、編集工程での使用を想定しています。
 
+## 使用技術
+
+本ツールはプライバシー保護のため、すべての解析処理をブラウザ上（クライアントサイド）で実行します。ファイルがサーバーにアップロードされることはありません。
+
+- **PDF解析**: [PDF.js](https://mozilla.github.io/pdf.js/) - PDFからのテキスト抽出
+- **Word解析**: [Mammoth.js](https://github.com/mvoloskov/mammoth.js) - .docxからのテキスト抽出
+- **文字判定**: JavaScript 正規表現 (Unicode Property Escapes)
+
+## 解析ロジックとデータ出典
+
+### 1. 判定基準（常用漢字）
+判定に使用している漢字リストは、**文化庁「常用漢字表（平成22年内閣告示第2号）」**に基づいた計2,136文字です。
+> [文化庁 常用漢字表について](https://www.bunka.go.jp/kokugo_nihongo/sisaku/joho/joho/kijun/naikaku/kanji/index.html)
+
+### 2. テキストの正規化
+解析前に Unicode 正規化（NFKC）を行っています。これにより、互換漢字や全角記号などの表記ゆれによる誤判定を抑制しています。
+
+### 3. 文脈表示仕様
+常用外漢字を検出した際、その前後の各15文字を「文脈」として表示します。これにより、固有名詞（人名・地名）や専門用語としての許容範囲かどうかを即座に判断可能です。
+
 ## 参考文献 / References
 
 本プロジェクトの開発にあたり、以下の資料およびデータを参照・利用させていただきました。
@@ -20,9 +40,17 @@ https://edi-tool.github.io/kanji-checker/
 * [mimneko/kanji-data](https://github.com/mimneko/kanji-data)
   * 漢字データの構造化におけるベースデータとして利用
 
+### システム
+* [Mammoth.js](https://github.com/mvoloskov/mammoth.js) 
+  * 本ツールのシステムの参考
+
 ### デザイン
 * [kzhrknt/awesome-design-md-jp](https://github.com/kzhrknt/awesome-design-md-jp)
   * 本ツール（index）のデザインの参考
+
+## 免責事項
+- PDFの作成方法（画像化されたPDFなど）によっては、テキストが抽出できない場合があります。
+- 本ツールは校正の補助を目的としており、最終的な表記確認は利用者の責任において行ってください。
 
 ---
 © 2026 ISHIKAWA, Natsuki
