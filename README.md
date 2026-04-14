@@ -20,9 +20,9 @@ https://edi-tool.github.io/kanji-checker/
 * [mimneko/kanji-data](https://github.com/mimneko/kanji-data)
   * 漢字データの構造化におけるベースデータとして利用
 
-### デザイン・構成
+### デザイン
 * [kzhrknt/awesome-design-md-jp](https://github.com/kzhrknt/awesome-design-md-jp)
-  * 本ドキュメント（README）のデザインおよび構成の参考
+  * 本ツール（index）のデザインの参考
 
 ---
 © 2026 ISHIKAWA, Natsuki
