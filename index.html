@@ -215,7 +215,9 @@
         });
 
         function analyzeKanji(text) {
-            const kanjiRegex = /[\u4E00-\u9FFF]/g;
+            // \p{Script=Han} で「漢字」プロパティを持つすべての文字にマッチさせます。
+　　　　　　 // ※この記法を使用する場合、末尾の 'u' (unicode) フラグが必須です。
+            const kanjiRegex = /\p{Script=Han}/gu;
             const results = {}; // { '漢字': [文脈1, 文脈2] }
             const contextPadding = 15;
             let match;
