@@ -1,2 +1,6 @@
 plugins: 
   - jekyll-sitemap
+show_downloads: false
+google_analytics: edi-tool
+# テーマによっては以下のようなフラグで制御します
+show_edit_on_github: false
