@@ -1,6 +1,6 @@
 # 表外漢字判定ツール
 
-word,pdf内の漢字が、常用漢字かを判定して、表外字を指摘するツールです。
+PDF,Word内の漢字が、常用漢字かを判定して、表外字を指摘するツールです。
 
 https://edi-tool.github.io/kanji-checker/
 
