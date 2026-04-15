@@ -1,6 +1,8 @@
-plugins: 
+url: "https://edi-tool.github.io"
+baseurl: "/kanji-checker"
+
+plugins:
   - jekyll-sitemap
-show_downloads: false
+
+# Google Analytics 4 トラッキングID（例: G-XXXXXXXXXX）
 google_analytics: edi-tool
-# テーマによっては以下のようなフラグで制御します
-show_edit_on_github: false

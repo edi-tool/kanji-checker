@@ -1,7 +1,7 @@
 ---
 layout: null
-title: 常用漢字チェックツール
-description: PDF,Word内の常用漢字を判定するツールです。
+title: 常用漢字さん
+description: PDF・Word内の常用漢字外の漢字を判定・文脈表示するツールです。
 lang: ja
 ---
 <!DOCTYPE html>
@@ -9,8 +9,19 @@ lang: ja
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>常用漢字さん</title>
-    
+
+    <title>{{ page.title }}</title>
+    <meta name="description" content="{{ page.description }}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/">
+
+    <!-- OGP -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ page.title }}">
+    <meta property="og:description" content="{{ page.description }}">
+    <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/">
+    <meta property="og:locale" content="ja_JP">
+
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
@@ -55,7 +66,7 @@ lang: ja
         }
 
         /* Headings */
-        h2 { 
+        h1 { 
             margin-top: 0; 
             margin-bottom: 8px;
             font-size: 18px;
@@ -170,7 +181,7 @@ lang: ja
 <body>
 
     <div class="container">
-        <h2>常用漢字さん</h2>
+        <h1>常用漢字さん</h1>
         <span class="subtitle">(PDF・Word　常用漢字チェッカー)</span>
         
         <div class="instruction">PDFまたはWord(.docx)ファイルを読み込む</div>
