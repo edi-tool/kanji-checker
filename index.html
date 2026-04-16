@@ -31,6 +31,7 @@ lang: ja
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     
     <script src="kanji_data.js"></script>
+    <script src="jinmei-kanji-data.js"></script>
     <style>
         /* Typography & Visual Theme */
         body {
@@ -170,6 +171,20 @@ lang: ja
             padding: 0 2px;
             border-radius: 2px;
         }
+        /* 人名用漢字タグ */
+        .jinmei-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #1565c0;
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 4px;
+            padding: 2px 6px;
+            vertical-align: middle;
+            margin-left: 8px;
+            transform: translateY(-2px); /* 少し位置を上に微調整 */
+        }
 
         /* Footer */
         footer {
@@ -262,36 +277,48 @@ lang: ja
         });
 
         function analyzeKanji(text) {
-            text = text.normalize('NFKC'); // CJK互換漢字（U+F900–U+FAFF）をCJK統合漢字に正規化
-            // \p{Script=Han} で「漢字」プロパティを持つすべての文字にマッチさせます。
-            const kanjiRegex = /\p{Script=Han}/gu;
-            const results = {}; // { '漢字': [文脈1, 文脈2] }
-            const contextPadding = 15;
-            let match;
+        function analyzeKanji(text) {
+             text = text.normalize('NFKC');
+             const kanjiRegex = /\p{Script=Han}/gu;
+             const results = {}; // 変更後: { '漢字': { contexts: Set, isJinmei: boolean } }
+             const contextPadding = 15;
+             let match;
+ 
+             if (typeof joyoKanji === 'undefined') {
+                 document.getElementById("errorMsg").textContent = "常用漢字リスト(kanji_data.js)が見つかりません。";
+                 return;
+             }
+ 
+             while ((match = kanjiRegex.exec(text)) !== null) {
+                 const char = match[0];
+                 const index = match.index;
+ 
+                 // 常用漢字リストに含まれていない場合
+                 if (!joyoKanji.includes(char)) {
+                     const start = Math.max(0, index - contextPadding);
+                     const end = Math.min(text.length, index + contextPadding + 1);
+                     const context = text.substring(start, end);
+ 
+                     // --- ここから変更 ---
+                     if (!results[char]) {
+                         results[char] = { 
+                             contexts: new Set(), 
+                             isJinmei: false 
+                         };
+                        
+                         // 人名用漢字リストに含まれているか判定
+                         // (jinmei-kanji-data.js の isJinmeiyoKanji 関数を使用)
+                         if (typeof isJinmeiyoKanji === 'function' && isJinmeiyoKanji(char)) {
+                             results[char].isJinmei = true;
+                         }
+                     }
+                     results[char].contexts.add(context);
+                     // --- ここまで変更 ---
+                 }
+             } 
 
-            // joyoKanji は kanji_data.js から読み込まれている前提
-            if (typeof joyoKanji === 'undefined') {
-                document.getElementById("errorMsg").textContent = "常用漢字リスト(kanji_data.js)が見つかりません。";
-                return;
-            }
-
-            while ((match = kanjiRegex.exec(text)) !== null) {
-                const char = match[0];
-                const index = match.index;
-
-                // 常用漢字リストに含まれていない場合
-                if (!joyoKanji.includes(char)) {
-                    const start = Math.max(0, index - contextPadding);
-                    const end = Math.min(text.length, index + contextPadding + 1);
-                    const context = text.substring(start, end);
-
-                    if (!results[char]) results[char] = new Set();
-                    results[char].add(context);
-                }
-            }
-
-            renderResults(results);
-        }
+             renderResults(results);
+         }
 
         function renderResults(results) {
             const resultArea = document.getElementById("resultArea");
@@ -309,16 +336,25 @@ lang: ja
 
                 const header = document.createElement("div");
                 header.className = "kanji-header";
-                header.innerHTML = `<span class="kanji-char">${kanji}</span>`;
+                
+                // --- ここから変更 ---
+                const kanjiData = results[kanji];
+                let headerHTML = `<span class="kanji-char">${kanji}</span>`;
+                
+                // 人名用漢字の場合、タグを追加
+                if (kanjiData.isJinmei) {
+                    headerHTML += `<span class="jinmei-tag">人名用漢字</span>`;
+                }
+                header.innerHTML = headerHTML;
                 group.appendChild(header);
 
                 const list = document.createElement("ul");
                 list.className = "context-list";
                 
-                results[kanji].forEach(ctx => {
+                // contexts.forEach に変更
+                kanjiData.contexts.forEach(ctx => {
                     const li = document.createElement("li");
                     li.className = "context-item";
-                    // 該当漢字をハイライト
                     const highlighted = ctx.replace(new RegExp(kanji, 'g'), `<span class="highlight">${kanji}</span>`);
                     li.innerHTML = `...${highlighted}...`;
                     list.appendChild(li);
