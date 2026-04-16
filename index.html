@@ -185,6 +185,25 @@ lang: ja
             margin-left: 8px;
             transform: translateY(-2px); /* 少し位置を上に微調整 */
         }
+        /* 報告ボタン */
+        .report-btn {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            color: #757575;
+            padding: 4px 10px;
+            font-size: 11px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: auto; /* 右端に寄せる */
+            transition: all 0.2s;
+        }
+        .report-btn:hover {
+            background-color: #f5f5f5;
+        }
+        .report-btn:disabled {
+            cursor: default;
+            pointer-events: none;
+        }
 
         /* Footer */
         footer {
@@ -352,16 +371,39 @@ lang: ja
                 const header = document.createElement("div");
                 header.className = "kanji-header";
                 
-                // --- ここから変更 ---
+               // --- ここから変更 (renderResults関数内のヘッダー生成部分) ---
                 const kanjiData = results[kanji];
-                let headerHTML = `<span class="kanji-char">${kanji}</span>`;
                 
-                // 人名用漢字の場合、タグを追加
+                // ヘッダーの中身をクリアしてDOMで組み立てる
+                header.innerHTML = "";
+                
+                // 1. 漢字本体
+                const charSpan = document.createElement("span");
+                charSpan.className = "kanji-char";
+                charSpan.innerText = kanji;
+                header.appendChild(charSpan);
+                
+                // 2. 人名用漢字タグ
                 if (kanjiData.isJinmei) {
-                    headerHTML += `<span class="jinmei-tag">人名用漢字</span>`;
+                    const tagSpan = document.createElement("span");
+                    tagSpan.className = "jinmei-tag";
+                    tagSpan.innerText = "人名用漢字";
+                    header.appendChild(tagSpan);
                 }
-                header.innerHTML = headerHTML;
+
+                // 3. 報告ボタン
+                const reportBtn = document.createElement("button");
+                reportBtn.className = "report-btn";
+                reportBtn.innerText = "⚠️ 誤検知を報告";
+                // 最初の3つの文脈をくっつけて送る（データが大きくなりすぎないように）
+                const contextStr = Array.from(kanjiData.contexts).slice(0, 3).join(' / ');
+                reportBtn.addEventListener("click", function() {
+                    reportKanji(kanji, contextStr, this);
+                });
+                header.appendChild(reportBtn);
+                
                 group.appendChild(header);
+                // --- ここまで変更 ---
 
                 const list = document.createElement("ul");
                 list.className = "context-list";
@@ -378,6 +420,35 @@ lang: ja
 
                 group.appendChild(list);
                 resultArea.appendChild(group);
+            });
+        }
+        // 誤検知報告を送信する関数
+        function reportKanji(kanji, context, buttonElement) {
+            buttonElement.innerText = "送信中...";
+            buttonElement.disabled = true;
+
+            // ★ここにStep1でコピーしたGASのURLを貼り付けます★
+            const url = https://script.google.com/macros/s/AKfycbyu-cbRTplLObP1cLBFfxTHimPcHdHDimSp4TekNFS1nue9lAMVEwvQAQAHf2VpTSD8/exec; 
+            
+            const formData = new URLSearchParams();
+            formData.append('kanji', kanji);
+            formData.append('context', context);
+
+            // 画面遷移なし（バックグラウンド）で送信
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors', // CORSエラーを回避するための設定
+                body: formData
+            }).then(() => {
+                // 送信成功時のボタン表示
+                buttonElement.innerText = "報告完了しました";
+                buttonElement.style.backgroundColor = "#e8f5e9";
+                buttonElement.style.color = "#2e7d32";
+                buttonElement.style.borderColor = "#a5d6a7";
+            }).catch(error => {
+                console.error('Error:', error);
+                buttonElement.innerText = "送信エラー";
+                buttonElement.disabled = false; // 再試行できるようにする
             });
         }
     </script>
