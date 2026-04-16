@@ -422,13 +422,22 @@ lang: ja
                 resultArea.appendChild(group);
             });
         }
-        // 誤検知報告を送信する関数
+// 誤検知報告を送信する関数
         function reportKanji(kanji, context, buttonElement) {
+            // ▼ ここから追加：確認ダイアログの表示 ▼
+            const confirmMessage = `「${kanji}」の誤検知を報告しますか？\n（※常用漢字・人名用漢字なのに検出されてしまった場合のみご報告ください）`;
+            if (!window.confirm(confirmMessage)) {
+                // 「キャンセル」が押された場合は何もせずに処理を終了する
+                return; 
+            }
+            // ▲ ここまで追加 ▲
+
+            // 「OK」が押された場合のみ、以下の送信処理が進む
             buttonElement.innerText = "送信中...";
             buttonElement.disabled = true;
 
-            // ★ここにStep1でコピーしたGASのURLを貼り付けます★
-            const url = "https://script.google.com/macros/s/AKfycbyu-cbRTplLObP1cLBFfxTHimPcHdHDimSp4TekNFS1nue9lAMVEwvQAQAHf2VpTSD8/exec";
+            // GASのURL（ご自身のURLのままです）
+            const url = "https://script.google.com/macros/s/AKfycbyu-cbRTplLObP1cLBFfxTHimPcHdHDimSp4TekNFS1nue9lAMVEwvQAQAHf2VpTSD8/exec"; 
             
             const formData = new URLSearchParams();
             formData.append('kanji', kanji);
@@ -437,10 +446,9 @@ lang: ja
             // 画面遷移なし（バックグラウンド）で送信
             fetch(url, {
                 method: 'POST',
-                mode: 'no-cors', // CORSエラーを回避するための設定
+                mode: 'no-cors',
                 body: formData
             }).then(() => {
-                // 送信成功時のボタン表示
                 buttonElement.innerText = "報告完了しました";
                 buttonElement.style.backgroundColor = "#e8f5e9";
                 buttonElement.style.color = "#2e7d32";
@@ -448,7 +456,7 @@ lang: ja
             }).catch(error => {
                 console.error('Error:', error);
                 buttonElement.innerText = "送信エラー";
-                buttonElement.disabled = false; // 再試行できるようにする
+                buttonElement.disabled = false;
             });
         }
     </script>
