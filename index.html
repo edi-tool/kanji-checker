@@ -425,7 +425,7 @@ lang: ja
 // 誤検知報告を送信する関数
         function reportKanji(kanji, context, buttonElement) {
             // ▼ ここから追加：確認ダイアログの表示 ▼
-            const confirmMessage = `「${kanji}」の誤検知を報告しますか？\n（※常用漢字・人名用漢字なのに検出されてしまった場合のみご報告ください）`;
+            const confirmMessage = `「${kanji}」の誤検知を報告しますか？\n（※常用漢字なのに、表外字として検出されてしまった場合のみご報告ください）`;
             if (!window.confirm(confirmMessage)) {
                 // 「キャンセル」が押された場合は何もせずに処理を終了する
                 return; 
