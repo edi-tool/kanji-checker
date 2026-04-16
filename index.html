@@ -277,7 +277,6 @@ lang: ja
         });
 
         function analyzeKanji(text) {
-        function analyzeKanji(text) {
              text = text.normalize('NFKC');
              const kanjiRegex = /\p{Script=Han}/gu;
              const results = {}; // 変更後: { '漢字': { contexts: Set, isJinmei: boolean } }
