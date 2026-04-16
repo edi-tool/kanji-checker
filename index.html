@@ -266,16 +266,29 @@ lang: ja
                     const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
                     fullText = result.value;
                 }
-
+                
                 analyzeKanji(fullText);
 
             } catch (err) {
                 console.error(err);
                 errorMsg.textContent = "ファイルの解析に失敗しました。";
                 resultArea.innerHTML = '<p class="placeholder-text">読み込みエラーが発生しました。</p>';
+            } finally {
+                // ▼ 追加：同じファイルを連続で選択できるように値をリセット
+                e.target.value = "";
             }
         });
-
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, function(match) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[match];
+            });
+        }
         function analyzeKanji(text) {
              text = text.normalize('NFKC');
              const kanjiRegex = /\p{Script=Han}/gu;
@@ -354,7 +367,8 @@ lang: ja
                 kanjiData.contexts.forEach(ctx => {
                     const li = document.createElement("li");
                     li.className = "context-item";
-                    const highlighted = ctx.replace(new RegExp(kanji, 'g'), `<span class="highlight">${kanji}</span>`);
+                    const escapedCtx = escapeHTML(ctx); // まず安全な文字に変換
+                    const highlighted = escapedCtx.replace(new RegExp(kanji, 'g'), `<span class="highlight">${kanji}</span>`); // その後ハイライト
                     li.innerHTML = `...${highlighted}...`;
                     list.appendChild(li);
                 });
