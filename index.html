@@ -305,8 +305,11 @@ lang: ja
                  const char = match[0];
                  const index = match.index;
  
-                 // 常用漢字リストに含まれていない場合
-                 if (!joyoKanji.includes(char)) {
+                 const isJoyo = joyoKanji.includes(char);
+                 const isHouseRule = typeof houseRules !== 'undefined' && houseRules.includes(char);
+                 
+                 // 常用漢字でもハウスルールでもない場合のみ処理する
+                 if (!isJoyo && !isHouseRule) {
                      const start = Math.max(0, index - contextPadding);
                      const end = Math.min(text.length, index + contextPadding + 1);
                      const context = text.substring(start, end);
