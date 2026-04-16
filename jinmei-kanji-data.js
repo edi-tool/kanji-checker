@@ -20,6 +20,3 @@ const isJinmeiyoKanji = (char) => {
   return JINMEI_KANJI_LIST.includes(char);
 };
 
-// ES Modules としてエクスポート
-// ※ Node.js(CommonJS)環境でお使いの場合は以下の行を `module.exports = { JINMEI_KANJI_LIST, isJinmeiyoKanji };` に変更してください。
-export { JINMEI_KANJI_LIST, isJinmeiyoKanji };
