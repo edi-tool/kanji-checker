@@ -394,7 +394,7 @@ lang: ja
                 // 3. 報告ボタン
                 const reportBtn = document.createElement("button");
                 reportBtn.className = "report-btn";
-                reportBtn.innerText = "⚠️ 常用漢字の誤検知";
+                reportBtn.innerText = "⚠️ 誤検知を報告";
                 // 最初の3つの文脈をくっつけて送る（データが大きくなりすぎないように）
                 const contextStr = Array.from(kanjiData.contexts).slice(0, 3).join(' / ');
                 reportBtn.addEventListener("click", function() {
