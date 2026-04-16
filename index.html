@@ -363,7 +363,7 @@ lang: ja
                 return;
             }
 
-            resultArea.innerHTML = "";
+            resultArea.innerHTML = '<p class="instruction" style="margin-bottom: 16px; color: #d97a00;">このファイルの中にある、常用漢字以外の漢字はこちらです。</p>';
             kanjis.sort().forEach(kanji => {
                 const group = document.createElement("div");
                 group.className = "kanji-group";
