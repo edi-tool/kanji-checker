@@ -22,10 +22,12 @@ lang: ja
     <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/">
     <meta property="og:locale" content="ja_JP">
 
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    
+    <link rel="icon" href="favicon.png" type="image/png">
+
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     
     <script src="kanji_data.js"></script>
@@ -177,6 +179,17 @@ lang: ja
             text-align: center;
         }
     </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "常用漢字さん",
+      "description": "PDF・Word内の常用漢字外の漢字を判定・文脈表示するツールです。",
+      "applicationCategory": "UtilitiesApplication",
+      "inLanguage": "ja",
+      "isAccessibleForFree": true
+    }
+    </script>
 </head>
 <body>
 
@@ -185,8 +198,8 @@ lang: ja
         <span class="subtitle">PDFまたはWord(.docx)からテキストを抽出し、表外漢字を指摘します</span>
         
         <div class="instruction">PDFまたはWord(.docx)ファイルを読み込む</div>
-        <input type="file" id="fileInput" accept=".pdf, application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-        <div id="errorMsg" class="error-msg"></div>
+        <input type="file" id="fileInput" aria-label="PDFまたはWordファイルを選択" accept=".pdf, application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <div id="errorMsg" class="error-msg" role="alert" aria-live="polite"></div>
         
         <div id="resultArea">
             <p class="placeholder-text">ファイルを読み込むと、検出された表外漢字と文脈が表示されます。</p>
