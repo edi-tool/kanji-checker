@@ -229,7 +229,7 @@ lang: ja
 
     <div class="container">
         <h1>常用漢字さん</h1>
-        <span class="subtitle">PDFまたはWord(.docx)からテキストを抽出し、表外漢字を指摘します</span>
+        <span class="subtitle">PDFまたはWord(.docx)からテキストを抽出し、表外漢字を指摘します。</span>
         
         <div class="instruction">PDFまたはWord(.docx)ファイルを読み込む</div>
         <input type="file" id="fileInput" aria-label="PDFまたはWordファイルを選択" accept=".pdf, application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
@@ -359,7 +359,7 @@ lang: ja
             const kanjis = Object.keys(results);
 
             if (kanjis.length === 0) {
-                resultArea.innerHTML = '<p class="placeholder-text" style="color:#2e7d32; font-weight:600;">常用外漢字は見つかりませんでした。</p>';
+                resultArea.innerHTML = '<p class="placeholder-text" style="color:#2e7d32; font-weight:600;">表外漢字は見つかりませんでした。</p>';
                 return;
             }
 
