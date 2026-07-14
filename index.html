@@ -9,8 +9,9 @@ lang: ja
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f8f6f2">
 
-    <title>常用漢字さん | {{ page.title }} | </title>
+    <title>常用漢字さん | {{ page.title }}</title>
     <meta name="description" content="{{ page.description }}">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ site.url }}{{ site.baseurl }}/">
@@ -33,9 +34,26 @@ lang: ja
     <script src="kanji_data.js"></script>
     <script src="jinmei-kanji-data.js"></script>
     <style>
+        /* ===== 共通デザイントークン（事務ツール5種で統一） ===== */
+        :root {
+            --bg: #f8f6f2;
+            --surface: #fff;
+            --border: #e0e0e0;
+            --text: #0f0f0f;
+            --text-sub: #757575;
+            --accent: #f28c06;
+            --accent-dark: #d97a00;
+            --accent-soft: #fff8f0;
+            --danger: #e53935;
+        }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+
         /* Typography & Visual Theme */
         body {
-            font-family: noto-sans, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, arial, sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Roboto, sans-serif;
             background-color: #f8f6f2;
             color: #0f0f0f;
             line-height: 1.5;
@@ -107,7 +125,8 @@ lang: ja
             cursor: pointer;
         }
         input[type="file"]:hover {
-            border-color: #f28c06;
+            border-color: var(--accent);
+            background-color: var(--accent-soft);
         }
 
         /* Error Message */
@@ -149,7 +168,7 @@ lang: ja
         .kanji-char {
             font-size: 24px;
             font-weight: 600;
-            color: #f28c06;
+            color: var(--accent);
             margin-right: 12px;
         }
         .context-list {
@@ -158,7 +177,6 @@ lang: ja
             list-style-type: none;
         }
         .context-item {
-            font-family: "Courier New", Courier, monospace;
             font-size: 13px;
             color: #444;
             margin-bottom: 6px;
