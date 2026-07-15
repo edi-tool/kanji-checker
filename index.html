@@ -29,9 +29,15 @@ lang: ja
 
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        window.pdfjsReady = import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.min.mjs').then(pdfjsLib => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.worker.min.mjs';
+            window.pdfjsLib = pdfjsLib;
+            return pdfjsLib;
+        });
+    </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.12.0/mammoth.browser.min.js"></script>
     
     <script src="kanji_data.js"></script>
     <script src="jinmei-kanji-data.js"></script>
@@ -265,9 +271,6 @@ lang: ja
     </footer>
 
     <script>
-        // PDF.js workerの設定
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
         document.getElementById('fileInput').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             const errorMsg = document.getElementById("errorMsg");
@@ -294,7 +297,8 @@ lang: ja
 
                 if (isPDF) {
                     // PDFのテキスト抽出処理
-                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                    const pdfjsLib = await window.pdfjsReady;
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer, isEvalSupported: false}).promise;
                     for (let i = 1; i <= pdf.numPages; i++) {
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
