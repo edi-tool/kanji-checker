@@ -18,7 +18,7 @@ lang: ja
 
     <!-- OGP -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ page.title }}">
+    <meta property="og:title" content="常用漢字さん | {{ page.title }}">
     <meta property="og:description" content="{{ page.description }}">
     <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/">
     <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}/favicon.png">
@@ -48,10 +48,11 @@ lang: ja
             --surface: #fff;
             --border: #e0e0e0;
             --text: #0f0f0f;
-            --text-sub: #757575;
+            --text-sub: #6b6b6b;
             --accent: #f28c06;
             --accent-dark: #d97a00;
             --accent-soft: #fff8f0;
+            --accent-text: #b35f00; /* 文字用のアクセント（白地で AA を満たす濃さ） */
             --danger: #e53935;
         }
         :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -62,8 +63,8 @@ lang: ja
         /* Typography & Visual Theme */
         body {
             font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, Roboto, sans-serif;
-            background-color: #f8f6f2;
-            color: #0f0f0f;
+            background-color: var(--bg);
+            color: var(--text);
             line-height: 1.5;
             letter-spacing: -0.4px;
             font-feature-settings: "liga";
@@ -73,7 +74,8 @@ lang: ja
             
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            /* 上寄せ: 中央寄せだとスマホで余白が上に空き、結果が出るたびにカードが跳ねる */
+            justify-content: flex-start;
             align-items: center;
             min-height: 100vh;
             margin: 0;
@@ -83,8 +85,8 @@ lang: ja
 
         /* Cards Component */
         .container {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 32px 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -94,17 +96,32 @@ lang: ja
             box-sizing: border-box;
         }
 
+        @media (max-width: 480px) {
+            .container { padding: 24px 16px; }
+        }
+
         /* Headings */
-        h1 { 
-            margin-top: 0; 
+        .brand-link {
+            display: inline-block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-decoration: none;
+            letter-spacing: 0.02em;
+        }
+        .brand-link:hover { color: var(--accent-text); text-decoration: underline; }
+        h1 {
+            margin-top: 0;
             margin-bottom: 8px;
             font-size: 18px;
             font-weight: 600;
-            color: #0f0f0f; 
+            color: var(--text);
         }
         .subtitle {
-            font-size: 12px;
-            color: #757575;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-sub);
             display: block;
             margin-bottom: 24px;
         }
@@ -112,34 +129,61 @@ lang: ja
         .instruction {
             font-size: 14px;
             font-weight: 600;
-            color: #0f0f0f;
+            color: var(--text);
             margin-bottom: 8px;
             text-align: left;
         }
         
-        /* File Input Styling */
-        input[type="file"] {
-            width: 100%;
-            padding: 8px 12px;
+        /* ファイル選択: クリック・ドラッグ＆ドロップ・キーボードに対応したドロップゾーン */
+        .drop-zone {
+            display: block;
+            border: 2px dashed #d4d4d4;
+            border-radius: 12px;
+            background-color: #fafafa;
+            padding: 24px 16px;
             margin-bottom: 8px;
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: inherit;
             cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
         }
-        input[type="file"]:hover {
+        /* input 本体は隠し、キーボードでフォーカスしたときはゾーンに枠を出す（Enter/Space で選択画面が開く） */
+        #fileInput:focus-visible + .drop-zone {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .drop-zone:hover, .drop-zone.is-dragover {
             border-color: var(--accent);
             background-color: var(--accent-soft);
+        }
+        .drop-icon {
+            display: block;
+            width: 28px;
+            height: 28px;
+            margin: 0 auto 8px;
+            color: var(--accent);
+        }
+        .drop-title {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .drop-note {
+            display: block;
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
         }
 
         /* Error Message */
         .error-msg {
-            color: #e53935;
+            color: var(--danger);
             font-size: 12px;
             min-height: 18px;
             margin-bottom: 8px;
@@ -148,80 +192,142 @@ lang: ja
 
         /* Result Area */
         #resultArea {
-            margin-top: 24px;
+            margin-top: 16px;
             text-align: left;
         }
         .placeholder-text {
-            color: #9e9e9e;
+            color: var(--text-sub);
             text-align: center;
             font-size: 14px;
             padding: 40px 0;
         }
 
+        /* 集計行 */
+        .summary {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 12px;
+            background-color: var(--accent-soft);
+            border: 1px solid #ffd9a8;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+        .summary-text {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            flex: 1 1 auto;
+            font-variant-numeric: tabular-nums;
+        }
+        .summary-text strong {
+            color: var(--accent-text);
+            font-size: 18px;
+        }
+        .summary-sub {
+            display: block;
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-sub);
+        }
+        .copy-btn {
+            border: 1px solid var(--accent);
+            background-color: var(--surface);
+            color: var(--accent-text);
+            border-radius: 8px;
+            padding: 8px 16px;
+            min-height: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover { background-color: var(--accent-soft); }
+
         /* Kanji Result Items */
         .kanji-group {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             padding: 16px;
-            border: 1px solid #f0f0f0;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            background-color: #fcfcfc;
+            background-color: var(--surface);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
         .kanji-header {
             display: flex;
-            align-items: baseline;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 12px;
             border-bottom: 1px solid #eee;
-            padding-bottom: 4px;
+            padding-bottom: 8px;
         }
         .kanji-char {
             font-size: 24px;
             font-weight: 600;
-            color: var(--accent);
-            margin-right: 12px;
+            line-height: 1.2;
+            color: var(--accent-text);
+        }
+        /* バッジ（出現回数・人名用漢字）は形を共通にする */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: #f5f5f5;
+            color: var(--text-sub);
+            font-variant-numeric: tabular-nums;
+        }
+        .badge-jinmei {
+            color: #1565c0;
+            background: #e3f2fd;
+            border-color: #90caf9;
         }
         .context-list {
             margin: 0;
-            padding-left: 1.2em;
+            padding-left: 0;
             list-style-type: none;
         }
         .context-item {
             font-size: 13px;
             color: #444;
             margin-bottom: 6px;
-            line-height: 1.4;
+            line-height: 1.6;
         }
         .highlight {
             background-color: #fff3e0;
-            color: #d97a00;
+            color: var(--accent-text);
             font-weight: bold;
             padding: 0 2px;
             border-radius: 2px;
         }
-        /* 人名用漢字タグ */
-        .jinmei-tag {
-            display: inline-block;
-            font-size: 11px;
+        .more-contexts > summary {
+            font-size: 12px;
             font-weight: 600;
-            color: #1565c0;
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
-            border-radius: 4px;
-            padding: 2px 6px;
-            vertical-align: middle;
-            margin-left: 8px;
-            transform: translateY(-2px); /* 少し位置を上に微調整 */
+            color: var(--accent-text);
+            cursor: pointer;
+            padding: 4px 0;
         }
+        .more-contexts[open] > summary { margin-bottom: 6px; }
         /* 報告ボタン */
         .report-btn {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            color: #757575;
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-sub);
             padding: 4px 10px;
+            min-height: 28px;
             font-size: 11px;
-            border-radius: 4px;
+            font-family: inherit;
+            border-radius: 6px;
             cursor: pointer;
             margin-left: auto; /* 右端に寄せる */
-            transition: all 0.2s;
+            transition: background-color 0.2s;
         }
         .report-btn:hover {
             background-color: #f5f5f5;
@@ -230,14 +336,26 @@ lang: ja
             cursor: default;
             pointer-events: none;
         }
+        .report-btn.is-done {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-color: #a5d6a7;
+        }
+        .result-ok {
+            color: #2e7d32;
+            font-weight: 600;
+        }
 
         /* Footer */
         footer {
             margin-top: 32px;
             font-size: 12px;
-            color: #757575;
+            color: var(--text-sub);
             text-align: center;
+            word-break: normal;
         }
+        footer a { color: inherit; }
+        footer a:hover { color: var(--accent-text); }
     </style>
     <script type="application/ld+json">
     {
@@ -254,25 +372,48 @@ lang: ja
 <body>
 
     <div class="container">
+        <a class="brand-link" href="https://edi-tool.github.io/">edi-tool</a>
         <h1>常用漢字さん</h1>
         <span class="subtitle">PDFまたはWord(.docx)からテキストを抽出し、表外漢字を指摘します。</span>
         
-        <div class="instruction">PDFまたはWord(.docx)ファイルを読み込む</div>
-        <input type="file" id="fileInput" aria-label="PDFまたはWordファイルを選択" accept=".pdf, application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <input type="file" id="fileInput" class="visually-hidden" aria-label="PDFまたはWordファイルを選択" accept=".pdf, application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <label class="drop-zone" id="dropZone" for="fileInput">
+            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
+            <span class="drop-title">PDF / Word をドロップ、またはクリックして選択</span>
+            <span class="drop-note">.pdf / .docx に対応（ファイルは外部送信しません）</span>
+        </label>
         <div id="errorMsg" class="error-msg" role="alert" aria-live="polite"></div>
         
-        <div id="resultArea">
+        <div id="resultArea" aria-live="polite">
             <p class="placeholder-text">ファイルを読み込むと、検出された表外漢字と文脈が表示されます。</p>
         </div>
     </div>
 
     <footer>
-        &copy; 2026 ISHIKAWA, Natsuki | MIT License
+        <a href="https://edi-tool.github.io/">← edi-tool ツール一覧</a> | &copy; 2026 ISHIKAWA, Natsuki | MIT License
     </footer>
 
     <script>
-        document.getElementById('fileInput').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
+        const fileInput = document.getElementById('fileInput');
+        const dropZone = document.getElementById('dropZone');
+
+        fileInput.addEventListener('change', async function(e) {
+            await handleFile(e.target.files[0]);
+            // 同じファイルを連続で選択できるように値をリセット
+            e.target.value = "";
+        });
+
+        // ドラッグ＆ドロップ。ゾーン外に落としてもブラウザがファイルを開かないよう、ページ全体で既定動作を止める
+        ['dragover', 'drop'].forEach(type => window.addEventListener(type, e => e.preventDefault()));
+        dropZone.addEventListener('dragover', () => dropZone.classList.add('is-dragover'));
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('is-dragover'));
+        dropZone.addEventListener('drop', e => {
+            dropZone.classList.remove('is-dragover');
+            const file = e.dataTransfer && e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        async function handleFile(file) {
             const errorMsg = document.getElementById("errorMsg");
             const resultArea = document.getElementById("resultArea");
 
@@ -290,8 +431,8 @@ lang: ja
             }
 
             try {
-                resultArea.innerHTML = '<p class="placeholder-text">解析中...</p>';
-                
+                resultArea.innerHTML = '<p class="placeholder-text" id="progressText">解析中...</p>';
+
                 const arrayBuffer = await file.arrayBuffer();
                 let fullText = "";
 
@@ -299,7 +440,9 @@ lang: ja
                     // PDFのテキスト抽出処理
                     const pdfjsLib = await window.pdfjsReady;
                     const pdf = await pdfjsLib.getDocument({data: arrayBuffer, isEvalSupported: false}).promise;
+                    const progressText = document.getElementById('progressText');
                     for (let i = 1; i <= pdf.numPages; i++) {
+                        if (progressText) progressText.textContent = `解析中... (${i} / ${pdf.numPages} ページ)`;
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
                         fullText += textContent.items.map(item => item.str).join('');
@@ -309,18 +452,15 @@ lang: ja
                     const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
                     fullText = result.value;
                 }
-                
+
                 analyzeKanji(fullText);
 
             } catch (err) {
                 console.error(err);
                 errorMsg.textContent = "ファイルの解析に失敗しました。";
                 resultArea.innerHTML = '<p class="placeholder-text">読み込みエラーが発生しました。</p>';
-            } finally {
-                // ▼ 追加：同じファイルを連続で選択できるように値をリセット
-                e.target.value = "";
             }
-        });
+        }
         function escapeHTML(str) {
             return str.replace(/[&<>'"]/g, function(match) {
                 return {
@@ -335,114 +475,151 @@ lang: ja
         function analyzeKanji(text) {
              text = text.normalize('NFKC');
              const kanjiRegex = /\p{Script=Han}/gu;
-             const results = {}; // 変更後: { '漢字': { contexts: Set, isJinmei: boolean } }
+             const results = {}; // { '漢字': { contexts: Set, count: number, isJinmei: boolean } }
              const contextPadding = 15;
              let match;
- 
+
              if (typeof joyoKanji === 'undefined') {
                  document.getElementById("errorMsg").textContent = "常用漢字リスト(kanji_data.js)が見つかりません。";
                  return;
              }
- 
+
              while ((match = kanjiRegex.exec(text)) !== null) {
                  const char = match[0];
                  const index = match.index;
- 
+
                  const isJoyo = joyoKanji.includes(char);
                  const isHouseRule = typeof houseRules !== 'undefined' && houseRules.includes(char);
-                 
+
                  // 常用漢字でもハウスルールでもない場合のみ処理する
                  if (!isJoyo && !isHouseRule) {
                      const start = Math.max(0, index - contextPadding);
                      const end = Math.min(text.length, index + contextPadding + 1);
                      const context = text.substring(start, end);
- 
-                     // --- ここから変更 ---
+
                      if (!results[char]) {
-                         results[char] = { 
-                             contexts: new Set(), 
-                             isJinmei: false 
+                         results[char] = {
+                             contexts: new Set(),
+                             count: 0,
+                             isJinmei: false
                          };
-                        
+
                          // 人名用漢字リストに含まれているか判定
                          // (jinmei-kanji-data.js の isJinmeiyoKanji 関数を使用)
                          if (typeof isJinmeiyoKanji === 'function' && isJinmeiyoKanji(char)) {
                              results[char].isJinmei = true;
                          }
                      }
+                     results[char].count++;
                      results[char].contexts.add(context);
-                     // --- ここまで変更 ---
                  }
-             } 
+             }
 
              renderResults(results);
          }
 
+        // 文脈は先頭この件数だけ表示し、残りは折りたたむ
+        const VISIBLE_CONTEXTS = 5;
+
+        function createContextItem(ctx, kanji) {
+            const li = document.createElement("li");
+            li.className = "context-item";
+            const escapedCtx = escapeHTML(ctx); // まず安全な文字に変換
+            const highlighted = escapedCtx.replace(new RegExp(kanji, 'g'), `<span class="highlight">${kanji}</span>`); // その後ハイライト
+            li.innerHTML = `...${highlighted}...`;
+            return li;
+        }
+
         function renderResults(results) {
             const resultArea = document.getElementById("resultArea");
-            const kanjis = Object.keys(results);
+            const kanjis = Object.keys(results).sort();
 
             if (kanjis.length === 0) {
-                resultArea.innerHTML = '<p class="placeholder-text" style="color:#2e7d32; font-weight:600;">表外漢字は見つかりませんでした。</p>';
+                resultArea.innerHTML = '<p class="placeholder-text result-ok">表外漢字は見つかりませんでした。</p>';
                 return;
             }
 
-            resultArea.innerHTML = '<p class="instruction" style="margin-bottom: 16px; color: #d97a00;">このファイルの中にある、常用漢字以外の漢字はこちらです。</p>';
-            kanjis.sort().forEach(kanji => {
+            // 集計行（字数・人名用・出現回数）とコピーボタン
+            const jinmeiCount = kanjis.filter(k => results[k].isJinmei).length;
+            const totalCount = kanjis.reduce((sum, k) => sum + results[k].count, 0);
+            resultArea.innerHTML = `
+                <div class="summary">
+                    <p class="summary-text">表外漢字 <strong>${kanjis.length}</strong> 字
+                        <span class="summary-sub">うち人名用漢字 ${jinmeiCount} 字・出現 ${totalCount} 回</span></p>
+                    <button type="button" class="copy-btn" id="copyBtn">検出漢字をコピー</button>
+                </div>`;
+            const copyBtn = document.getElementById("copyBtn");
+            copyBtn.addEventListener("click", async () => {
+                try {
+                    await navigator.clipboard.writeText(kanjis.join(''));
+                    copyBtn.textContent = "コピーしました";
+                } catch (err) {
+                    copyBtn.textContent = "コピーできませんでした";
+                }
+                setTimeout(() => { copyBtn.textContent = "検出漢字をコピー"; }, 2000);
+            });
+
+            kanjis.forEach(kanji => {
+                const kanjiData = results[kanji];
                 const group = document.createElement("div");
                 group.className = "kanji-group";
 
                 const header = document.createElement("div");
                 header.className = "kanji-header";
-                
-               // --- ここから変更 (renderResults関数内のヘッダー生成部分) ---
-                const kanjiData = results[kanji];
-                
-                // ヘッダーの中身をクリアしてDOMで組み立てる
-                header.innerHTML = "";
-                
+
                 // 1. 漢字本体
                 const charSpan = document.createElement("span");
                 charSpan.className = "kanji-char";
-                charSpan.innerText = kanji;
+                charSpan.textContent = kanji;
                 header.appendChild(charSpan);
-                
-                // 2. 人名用漢字タグ
+
+                // 2. 出現回数
+                const countSpan = document.createElement("span");
+                countSpan.className = "badge";
+                countSpan.textContent = `${kanjiData.count}回`;
+                header.appendChild(countSpan);
+
+                // 3. 人名用漢字タグ
                 if (kanjiData.isJinmei) {
                     const tagSpan = document.createElement("span");
-                    tagSpan.className = "jinmei-tag";
-                    tagSpan.innerText = "人名用漢字";
+                    tagSpan.className = "badge badge-jinmei";
+                    tagSpan.textContent = "人名用漢字";
                     header.appendChild(tagSpan);
                 }
 
-                // 3. 報告ボタン
+                // 4. 報告ボタン
                 const reportBtn = document.createElement("button");
+                reportBtn.type = "button";
                 reportBtn.className = "report-btn";
-                reportBtn.innerText = "⚠️ 誤検知を報告";
+                reportBtn.textContent = "誤検知を報告";
                 // 最初の3つの文脈をくっつけて送る（データが大きくなりすぎないように）
                 const contextStr = Array.from(kanjiData.contexts).slice(0, 3).join(' / ');
                 reportBtn.addEventListener("click", function() {
                     reportKanji(kanji, contextStr, this);
                 });
                 header.appendChild(reportBtn);
-                
-                group.appendChild(header);
-                // --- ここまで変更 ---
 
+                group.appendChild(header);
+
+                const contexts = Array.from(kanjiData.contexts);
                 const list = document.createElement("ul");
                 list.className = "context-list";
-                
-                // contexts.forEach に変更
-                kanjiData.contexts.forEach(ctx => {
-                    const li = document.createElement("li");
-                    li.className = "context-item";
-                    const escapedCtx = escapeHTML(ctx); // まず安全な文字に変換
-                    const highlighted = escapedCtx.replace(new RegExp(kanji, 'g'), `<span class="highlight">${kanji}</span>`); // その後ハイライト
-                    li.innerHTML = `...${highlighted}...`;
-                    list.appendChild(li);
-                });
-
+                contexts.slice(0, VISIBLE_CONTEXTS).forEach(ctx => list.appendChild(createContextItem(ctx, kanji)));
                 group.appendChild(list);
+
+                if (contexts.length > VISIBLE_CONTEXTS) {
+                    const more = document.createElement("details");
+                    more.className = "more-contexts";
+                    const summary = document.createElement("summary");
+                    summary.textContent = `他 ${contexts.length - VISIBLE_CONTEXTS} 件の文脈を表示`;
+                    more.appendChild(summary);
+                    const moreList = document.createElement("ul");
+                    moreList.className = "context-list";
+                    contexts.slice(VISIBLE_CONTEXTS).forEach(ctx => moreList.appendChild(createContextItem(ctx, kanji)));
+                    more.appendChild(moreList);
+                    group.appendChild(more);
+                }
+
                 resultArea.appendChild(group);
             });
         }
@@ -474,9 +651,7 @@ lang: ja
                 body: formData
             }).then(() => {
                 buttonElement.innerText = "報告完了しました";
-                buttonElement.style.backgroundColor = "#e8f5e9";
-                buttonElement.style.color = "#2e7d32";
-                buttonElement.style.borderColor = "#a5d6a7";
+                buttonElement.classList.add("is-done");
             }).catch(error => {
                 console.error('Error:', error);
                 buttonElement.innerText = "送信エラー";
