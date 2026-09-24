@@ -2,6 +2,9 @@
 
 ## 2026-09-24 セッション（SEO）
 
+- `og:site_name`（edi-tool）を追加
+- Search Console 確認ファイルを jekyll-sitemap の出力から除外（`_config.yml` の defaults）
+- `<head>` の mammoth・漢字データ読み込みを `defer` 化（描画ブロック解消）。preconnect を実際の CDN（cdn.jsdelivr.net）に修正
 - meta description を具体化（対応形式・判定基準・用途を明記）
 - `<title>`・`og:title` をキーワード先頭（「{機能名} | {ツール名}」）に変更
 - 構造化データを `@graph` 化: WebApplication に `url`・`operatingSystem`・`offers`（無料）・`isPartOf`/`publisher` を追加し、BreadcrumbList を追加
