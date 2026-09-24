@@ -16,6 +16,12 @@
 - 報告ボタンの絵文字を外し `type="button"`。`og:title` を `<title>` と同形式に。カードを上寄せに。判定ロジックは変更なし。
 - **共通**: 見出しの上に「edi-tool」（ハブへのリンク）、フッターに「← edi-tool ツール一覧」を追加。`--text-sub` を #6b6b6b に濃くし、文字用アクセント `--accent-text: #b35f00` を追加（WCAG AA）。
 
+## 2026-09-24 セッション（第2弾: 印刷・OGP・改行）
+
+- **印刷**: 集計行に「印刷」ボタン。印刷時は入力欄・ボタン・フッターを隠し、折りたたんだ文脈も `beforeprint` で開いて全件出す（`afterprint` で戻す）。
+- **OGP**: 共有カード用の `ogp.png`（1200×630、Noto Sans JP で生成）を追加し、`og:image` をファビコンから差し替え、`twitter:card` を `summary_large_image` に。
+- **改行**: body の `word-break: break-all` を `normal` + `overflow-wrap: anywhere` に変更。和文は従来どおり1字単位で折り返し、英単語（License、Word 等）は途中で割らない。
+
 ## 関連
 
 - 組織ハブ: https://edi-tool.github.io/ （`edi-tool/edi-tool.github.io` リポジトリ）

@@ -21,9 +21,11 @@ lang: ja
     <meta property="og:title" content="常用漢字さん | {{ page.title }}">
     <meta property="og:description" content="{{ page.description }}">
     <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}/">
-    <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}/favicon.png">
+    <meta property="og:image" content="{{ site.url }}{{ site.baseurl }}/ogp.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:locale" content="ja_JP">
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
 
     <link rel="icon" href="favicon.png" type="image/png">
 
@@ -68,8 +70,9 @@ lang: ja
             line-height: 1.5;
             letter-spacing: -0.4px;
             font-feature-settings: "liga";
-            word-break: break-all;
-            overflow-wrap: break-word;
+            /* 和文は1字ごとに折り返せるので break-all は不要。英単語（License 等）を途中で割らない */
+            word-break: normal;
+            overflow-wrap: anywhere;
             line-break: strict;
             
             display: flex;
@@ -346,6 +349,34 @@ lang: ja
             font-weight: 600;
         }
 
+
+        /* 印刷: 結果だけを紙に出す（入力欄・ボタン・フッターは隠す） */
+        .print-btn {
+            border: 1px solid var(--border);
+            background-color: var(--surface);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 8px 16px;
+            min-height: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .print-btn:hover {
+            border-color: var(--accent);
+            background-color: var(--accent-soft);
+        }
+        @media print {
+            body { background: #fff; padding: 0; display: block; }
+            .container { max-width: none; border: none; box-shadow: none; padding: 0; }
+            .brand-link, .drop-zone, #fileInput, #errorMsg, footer,
+            .copy-btn, .print-btn, .report-btn { display: none !important; }
+            .kanji-group, .summary, .distribution { break-inside: avoid; box-shadow: none; }
+            .more-contexts > summary { display: none; }
+        }
+
         /* Footer */
         footer {
             margin-top: 32px;
@@ -518,6 +549,20 @@ lang: ja
              renderResults(results);
          }
 
+        // 印刷時は折りたたんだ文脈もすべて出す（CSS では details を開けないため）
+        window.addEventListener('beforeprint', () => {
+            document.querySelectorAll('details.more-contexts:not([open])').forEach(d => {
+                d.open = true;
+                d.dataset.printOpened = '1';
+            });
+        });
+        window.addEventListener('afterprint', () => {
+            document.querySelectorAll('details[data-print-opened]').forEach(d => {
+                d.open = false;
+                delete d.dataset.printOpened;
+            });
+        });
+
         // 文脈は先頭この件数だけ表示し、残りは折りたたむ
         const VISIBLE_CONTEXTS = 5;
 
@@ -547,6 +592,7 @@ lang: ja
                     <p class="summary-text">表外漢字 <strong>${kanjis.length}</strong> 字
                         <span class="summary-sub">うち人名用漢字 ${jinmeiCount} 字・出現 ${totalCount} 回</span></p>
                     <button type="button" class="copy-btn" id="copyBtn">検出漢字をコピー</button>
+                    <button type="button" class="print-btn" onclick="window.print()">印刷</button>
                 </div>`;
             const copyBtn = document.getElementById("copyBtn");
             copyBtn.addEventListener("click", async () => {
