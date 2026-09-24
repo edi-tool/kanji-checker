@@ -1,5 +1,11 @@
 # 進捗: 常用漢字さん（kanji-checker）
 
+## 2026-09-24 セッション（SEO）
+
+- meta description を具体化（対応形式・判定基準・用途を明記）
+- `<title>`・`og:title` をキーワード先頭（「{機能名} | {ツール名}」）に変更
+- 構造化データを `@graph` 化: WebApplication に `url`・`operatingSystem`・`offers`（無料）・`isPartOf`/`publisher` を追加し、BreadcrumbList を追加
+
 ## 2026-07-14 セッション
 
 - **修正**: `<title>` 末尾の余分な「 | 」を削除。
