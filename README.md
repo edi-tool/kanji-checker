@@ -4,6 +4,8 @@ PDF・Word 内の漢字が常用漢字かを判定し、表外字を前後の文
 
 🔗 https://edi-tool.github.io/kanji-checker/
 
+![常用漢字さんの画面](docs/screenshot.png)
+
 ## 使い方
 
 1. PDF または Word（.docx）ファイルを選ぶ（ドラッグ＆ドロップも可）
