@@ -7,6 +7,7 @@ PDF・Word 内の漢字が常用漢字かを判定し、表外字を指摘する
 
 - プレビュー: `python -m http.server 8000`
 - 整形: `npx prettier --write .`
+- テスト: `npm test` / HTML 静的チェック: `npm run check`
 
 ## プロジェクト方針
 
