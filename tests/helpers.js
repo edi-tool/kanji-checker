@@ -32,7 +32,7 @@ function load({ files = [], functions = [], from = 'index.html', globals = {}, e
     ...functions.map((f) => extractFunction(html, f)),
     `globalThis.__exports = { ${[...exports, ...functions].join(', ')} };`,
   ].join('\n;\n');
-  const context = vm.createContext({ ...globals });
+  const context = vm.createContext(globals); // 呼び出し側から状態を読めるよう、同じオブジェクトを使う
   vm.runInContext(code, context);
   return context.__exports;
 }
