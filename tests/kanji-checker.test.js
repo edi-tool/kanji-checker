@@ -26,12 +26,13 @@ test('常用漢字データは README の記載どおり 2,136 字で重複が�
   assert.ok(chars.every((c) => /\p{Script=Han}/u.test(c)), '漢字以外の文字が含まれている');
 });
 
-// 注意: jinmei-kanji-data.js の注記と法務省の告示は 863 字だが、現在のデータは 858 字（2026-09-25 時点）。
-// 旧字体（逸・海・社 など互換漢字 50 字余り）が常用漢字の字形に正規化されて重複・消失しているとみられる。
-// 出典と照合して直すまでは、意図しない増減を検出するため現状の字数を固定する。
-test('人名用漢字データの字数が変わっていない（現状 858 字・出典は 863 字）', () => {
-  const { JINMEI_KANJI_LIST } = analyzer();
-  assert.equal(JINMEI_KANJI_LIST.length, 858);
+test('人名用漢字データは告示どおり 863 字で、互換漢字 57 字以外は常用漢字と重複しない', () => {
+  const { JINMEI_KANJI_LIST, joyoKanji } = analyzer();
+  assert.equal(JINMEI_KANJI_LIST.length, 863);
+  const compat = JINMEI_KANJI_LIST.filter((c) => c.normalize('NFC') !== c);
+  assert.equal(compat.length, 57, '互換漢字が正規化で失われていないか');
+  const overlap = JINMEI_KANJI_LIST.filter((c) => c.normalize('NFC') === c && joyoKanji.includes(c));
+  assert.equal(overlap.join(''), '');
 });
 
 test('常用漢字は検出せず、表外字だけを文脈つきで検出する', () => {
