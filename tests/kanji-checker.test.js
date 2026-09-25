@@ -82,3 +82,28 @@ test('外部送信は誤検知報告（reportKanji）の 1 か所だけで、確
   assert.ok(html.slice(reportStart, fetches[0].index).includes('window.confirm'));
   assert.doesNotMatch(html, /sendBeacon|XMLHttpRequest|WebSocket/);
 });
+
+// Word から文字を 1 字も取り出せなかった場合（画像だけの文書など）
+async function handleEmpty(extra = {}) {
+  const els = { errorMsg: { textContent: '' }, resultArea: { innerHTML: '' } };
+  let analyzed = false;
+  const api = load({
+    functions: ['handleFile'],
+    globals: {
+      document: { getElementById: (id) => els[id] },
+      mammoth: { extractRawText: async () => ({ value: '  \n' }) },
+      analyzeKanji: () => { analyzed = true; },
+      console,
+      ...extra,
+    },
+  });
+  await api.handleFile({ name: 'a.docx', type: '', arrayBuffer: async () => new ArrayBuffer(0) });
+  return { els, analyzed };
+}
+
+test('文字を取り出せなかったときは「該当なし」と表示せず、読み取り失敗として知らせる', async () => {
+  const { els, analyzed } = await handleEmpty();
+  assert.equal(analyzed, false);
+  assert.match(els.errorMsg.textContent, /テキストを取り出せませんでした/);
+  assert.doesNotMatch(els.resultArea.innerHTML, /見つかりませんでした/);
+});

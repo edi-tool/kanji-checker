@@ -523,6 +523,13 @@ lang: ja
                     fullText = result.value;
                 }
 
+                // 文字を取り出せなかったときに「表外漢字なし」と誤表示しない（画像化PDFなど）
+                if (!fullText.trim()) {
+                    errorMsg.textContent = "※テキストを取り出せませんでした。判定は行っていません。";
+                    resultArea.innerHTML = '<p class="placeholder-text">ファイルから文字を読み取れませんでした。画像化（スキャン）されたPDFの可能性があります。</p>';
+                    return;
+                }
+
                 analyzeKanji(fullText);
 
             } catch (err) {
