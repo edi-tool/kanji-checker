@@ -6,3 +6,10 @@ plugins:
 
 # Google Analytics 4 トラッキングID（例: G-XXXXXXXXXX）
 google_analytics: edi-tool
+
+# Search Console の所有権確認ファイルを jekyll-sitemap の出力から除外する
+defaults:
+  - scope:
+      path: "googled180bd734463e748.html"
+    values:
+      sitemap: false
