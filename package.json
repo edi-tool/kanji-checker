@@ -1,0 +1,12 @@
+{
+  "name": "kanji-checker",
+  "private": true,
+  "description": "PDF・Word 内の表外漢字（常用漢字外）を検出するブラウザツール",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node scripts/check-static.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
