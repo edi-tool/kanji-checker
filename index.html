@@ -626,6 +626,9 @@ lang: ja
                  const char = match[0];
                  const index = match.index;
 
+                 // 踊り字「々」や漢数字のゼロ「〇」は漢字として数えない（常用漢字表の対象外の記号）
+                 if (isNonKanjiHanMark(char)) continue;
+
                  // 常用漢字（表の字体 4 字・ハウスルールを含む）でない場合のみ処理する
                  if (!JOYO_KANJI_SET.has(char)) {
                      const start = Math.max(0, index - contextPadding);

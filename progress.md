@@ -9,6 +9,7 @@
 - **常用漢字表の字体 4 字**: データは機器で使われる「填・剥・頬・叱」で持っており、表の字体「塡・剝・頰・𠮟」を表外字として検出していた。`joyoKanjiTableForms` を追加し、どちらも常用漢字として扱う（2,136 字のリスト自体は変えていない）。
 - **部首用文字コードの自動置き換え**: PDF 由来の CJK 部首補助（⻑ U+2ED1・⺠ U+2EA0 など）を、Unicode の EquivalentUnifiedIdeograph.txt（18.0.0）の 114 対応で通常の漢字へ置き換える（`kanji-normalize.js`。教育漢字さんと同じ内容）。
   これまで `houseRules` に「⻑⺠」を 1 字ずつ登録していた運用は不要になり、`houseRules` は空にした（仕組みは残してある）。
+- **踊り字・漢数字ゼロを対象外に**: 「々」「〻」「〇」は Unicode 上 Script=Han のため表外字として出ていた（「山々」「二〇二六年」で必ず検出）。`kanji-normalize.js` に `isNonKanjiHanMark` を追加し、判定から外す（教育漢字さんと同じ内容）。Editorial-Workspace の機械チェック（`tools/editool_bridge.cjs`）がこのリポジトリのデータと関数をそのまま読むので、`kanji_data.js`・`jinmei-kanji-data.js`・`kanji-normalize.js` のファイル名と`JOYO_KANJI_SET`・`isJinmeiyoKanji`・`normalizeKanjiText`・`compatIdeographBase`・`isNonKanjiHanMark` の名前は変えない（変えるときはブリッジも直す）。未push。
 - **旧字体（互換漢字）を見逃さない**: 以前は NFKC 正規化で U+FA19「神」の旧字体などが常用漢字と同一視され、指摘されなかった。互換漢字は正規化せずに残し、「常用漢字「神」の旧字体・異体字」の印を付ける。
   人名用漢字の互換漢字 57 字にも、ここで初めて「人名用漢字」の印が付くようになった。
 - **PDF**: PDF.js を 6.1.200 → 6.4.299。`cMapUrl` を指定していなかったため、フォントを埋め込んでいない日本語 PDF は文字を取り出せず「スキャン PDF の可能性」と表示されていた（公開版で再現、修正後は読めることをブラウザで確認）。

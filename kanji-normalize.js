@@ -78,3 +78,16 @@ function compatIdeographBase(char) {
   const base = char.normalize("NFKC");
   return base !== char ? base : null;
 }
+
+// 漢字として数えない記号。Unicode 上は漢字（Script=Han）に分類されるが、
+// 常用漢字表・学年別漢字配当表の対象ではない（踊り字「々」「〻」、漢数字のゼロ「〇」）。
+const NON_KANJI_HAN_MARKS = new Set(["々", "〻", "〇"]);
+
+/**
+ * 判定の対象にしない記号（踊り字・漢数字のゼロ）かどうか。
+ * @param {string} char
+ * @returns {boolean}
+ */
+function isNonKanjiHanMark(char) {
+  return NON_KANJI_HAN_MARKS.has(char);
+}

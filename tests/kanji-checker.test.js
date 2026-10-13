@@ -44,6 +44,11 @@ test('常用漢字は検出せず、表外字だけを文脈つきで検出す�
   assert.ok([...r['薔'].contexts][0].includes('学校で薔薇を'));
 });
 
+test('踊り字「々」「〻」と漢数字のゼロ「〇」は表外字として検出しない', () => {
+  const { run } = analyzer();
+  assert.deepEqual(Object.keys(run('山々と人々、二〇二六年の薔薇〻')), ['薔', '薇']);
+});
+
 test('前後 15 文字を文脈として切り出す', () => {
   const { run } = analyzer();
   const pad = 'あ'.repeat(20);
