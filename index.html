@@ -1,7 +1,7 @@
 ---
 layout: null
 title: 表外漢字検出ツール
-description: PDF・Word（.docx）中の常用漢字表にない漢字（表外漢字）を検出し、前後の文脈とあわせて表示する無料ツール。原稿の表記チェックに。ファイルは外部送信しません。
+description: PDF・Word（.docx）・テキスト中の常用漢字表にない漢字（表外漢字）を検出し、前後の文脈とあわせて表示する無料ツール。人名用漢字・旧字体も判別。原稿の表記チェックに。ファイルは外部送信しません。
 lang: ja
 ---
 <!DOCTYPE html>
@@ -33,8 +33,8 @@ lang: ja
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <script>
-        window.pdfjsReady = import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.min.mjs').then(pdfjsLib => {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.1.200/build/pdf.worker.min.mjs';
+        window.pdfjsReady = import('https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.min.mjs').then(pdfjsLib => {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/build/pdf.worker.min.mjs';
             window.pdfjsLib = pdfjsLib;
             return pdfjsLib;
         });
@@ -42,6 +42,7 @@ lang: ja
 
     <script defer src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js" integrity="sha384-8NWE3bZDrmRI4IePMoQaEoLhAQ1MmRMJkdNgnGiHRFanTqsFKr0TmK6aSZvFJ/PO" crossorigin="anonymous"></script>
     
+    <script defer src="kanji-normalize.js"></script>
     <script defer src="kanji_data.js"></script>
     <script defer src="jinmei-kanji-data.js"></script>
     <style>
@@ -185,6 +186,33 @@ lang: ja
             white-space: nowrap;
         }
 
+        /* テキスト貼り付け（ファイルにしなくても判定できる） */
+        .paste-box {
+            text-align: left;
+            margin-bottom: 8px;
+        }
+        .paste-box > summary {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-text);
+            cursor: pointer;
+            padding: 6px 0;
+        }
+        .paste-box textarea {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 4px 0 8px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font: inherit;
+            font-size: 16px; /* iOS で入力時に拡大されない大きさ */
+            line-height: 1.6;
+            resize: vertical;
+        }
+        .paste-box textarea:focus { border-color: var(--accent); }
+
         /* Error Message */
         .error-msg {
             color: var(--danger);
@@ -293,6 +321,11 @@ lang: ja
             background: #e3f2fd;
             border-color: #90caf9;
         }
+        .badge-variant {
+            color: #6a1b9a;
+            background: #f3e5f5;
+            border-color: #ce93d8;
+        }
         .context-list {
             margin: 0;
             padding-left: 0;
@@ -372,7 +405,7 @@ lang: ja
         @media print {
             body { background: #fff; padding: 0; display: block; }
             .container { max-width: none; border: none; box-shadow: none; padding: 0; }
-            .brand-link, .drop-zone, #fileInput, #errorMsg, footer,
+            .brand-link, .drop-zone, .paste-box, #fileInput, #errorMsg, footer,
             .copy-btn, .print-btn, .report-btn { display: none !important; }
             .kanji-group, .summary, .distribution { break-inside: avoid; box-shadow: none; }
             .more-contexts > summary { display: none; }
@@ -399,7 +432,7 @@ lang: ja
             "name": "常用漢字さん",
             "alternateName": "{{ page.title }}",
             "url": "https://edi-tool.github.io/kanji-checker/",
-            "description": "PDF・Word（.docx）中の常用漢字表にない漢字（表外漢字）を検出し、前後の文脈とあわせて表示する無料ツール。原稿の表記チェックに。ファイルは外部送信しません。",
+            "description": "PDF・Word（.docx）・テキスト中の常用漢字表にない漢字（表外漢字）を検出し、前後の文脈とあわせて表示する無料ツール。人名用漢字・旧字体も判別。原稿の表記チェックに。ファイルは外部送信しません。",
             "applicationCategory": "UtilitiesApplication",
             "operatingSystem": "Web",
             "browserRequirements": "Requires JavaScript",
@@ -444,18 +477,23 @@ lang: ja
     <div class="container">
         <a class="brand-link" href="https://edi-tool.github.io/">edi-tool</a>
         <h1>常用漢字さん</h1>
-        <span class="subtitle">PDFまたはWord(.docx)からテキストを抽出し、表外漢字を指摘します。</span>
+        <span class="subtitle">PDF・Word(.docx)・テキストから、常用漢字表にない漢字（表外漢字）を指摘します。</span>
         
-        <input type="file" id="fileInput" class="visually-hidden" aria-label="PDFまたはWordファイルを選択" accept=".pdf, application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <input type="file" id="fileInput" class="visually-hidden" aria-label="PDF・Word・テキストファイルを選択" accept=".pdf, application/pdf, .docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document, .txt, text/plain">
         <label class="drop-zone" id="dropZone" for="fileInput">
             <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><polyline points="9 15 12 12 15 15"></polyline></svg>
-            <span class="drop-title">PDF / Word をドロップ、またはクリックして選択</span>
-            <span class="drop-note">.pdf / .docx に対応（ファイルは外部送信しません）</span>
+            <span class="drop-title">PDF / Word / テキストをドロップ、またはクリックして選択</span>
+            <span class="drop-note">.pdf / .docx / .txt に対応（ファイルは外部送信しません）</span>
         </label>
+        <details class="paste-box">
+            <summary>文章を貼り付けて判定する</summary>
+            <textarea id="pasteInput" rows="5" aria-label="判定する文章" placeholder="ここに文章を貼り付けてください"></textarea>
+            <button type="button" class="copy-btn" id="pasteBtn">この文章を判定</button>
+        </details>
         <div id="errorMsg" class="error-msg" role="alert" aria-live="polite"></div>
         
         <div id="resultArea" aria-live="polite">
-            <p class="placeholder-text">ファイルを読み込むと、検出された表外漢字と文脈が表示されます。</p>
+            <p class="placeholder-text">ファイルを読み込むか文章を貼り付けると、検出された表外漢字と文脈が表示されます。</p>
         </div>
     </div>
 
@@ -483,6 +521,21 @@ lang: ja
             if (file) handleFile(file);
         });
 
+        // 貼り付けた文章の判定
+        document.getElementById('pasteBtn').addEventListener('click', () => {
+            const errorMsg = document.getElementById("errorMsg");
+            const text = document.getElementById('pasteInput').value;
+            errorMsg.textContent = "";
+            if (!text.trim()) {
+                errorMsg.textContent = "※判定する文章を入力してください。";
+                return;
+            }
+            analyzeKanji(text);
+        });
+
+        // PDF.js の CMap の配信元（上の import と同じバージョンにそろえる）
+        const PDFJS_CMAP_URL = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.4.299/cmaps/';
+
         async function handleFile(file) {
             const errorMsg = document.getElementById("errorMsg");
             const resultArea = document.getElementById("resultArea");
@@ -494,31 +547,36 @@ lang: ja
             const fileName = file.name.toLowerCase();
             const isPDF = file.type === 'application/pdf' || fileName.endsWith('.pdf');
             const isWord = file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || fileName.endsWith('.docx');
+            const isText = fileName.endsWith('.txt');
 
-            if (!isPDF && !isWord) {
-                errorMsg.textContent = "※PDFまたはWord(.docx)ファイルを選択してください。";
+            if (!isPDF && !isWord && !isText) {
+                errorMsg.textContent = "※PDF・Word(.docx)・テキスト(.txt)のいずれかを選択してください。";
                 return;
             }
 
             try {
                 resultArea.innerHTML = '<p class="placeholder-text" id="progressText">解析中...</p>';
 
-                const arrayBuffer = await file.arrayBuffer();
                 let fullText = "";
 
-                if (isPDF) {
+                if (isText) {
+                    fullText = await file.text();
+                } else if (isPDF) {
                     // PDFのテキスト抽出処理
+                    const arrayBuffer = await file.arrayBuffer();
                     const pdfjsLib = await window.pdfjsReady;
-                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer, isEvalSupported: false}).promise;
+                    // cMapUrl: フォントを埋め込んでいない日本語 PDF は CMap がないと文字を取り出せない
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer, isEvalSupported: false, cMapUrl: PDFJS_CMAP_URL, cMapPacked: true}).promise;
                     const progressText = document.getElementById('progressText');
                     for (let i = 1; i <= pdf.numPages; i++) {
                         if (progressText) progressText.textContent = `解析中... (${i} / ${pdf.numPages} ページ)`;
                         const page = await pdf.getPage(i);
                         const textContent = await page.getTextContent();
-                        fullText += textContent.items.map(item => item.str).join('');
+                        fullText += textContent.items.map(item => item.str).join('') + '\n';
                     }
                 } else if (isWord) {
                     // Word(.docx)のテキスト抽出処理 (Mammoth.jsを使用)
+                    const arrayBuffer = await file.arrayBuffer();
                     const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
                     fullText = result.value;
                 }
@@ -550,26 +608,26 @@ lang: ja
             });
         }
         function analyzeKanji(text) {
-             text = text.normalize('NFKC');
-             const kanjiRegex = /\p{Script=Han}/gu;
-             const results = {}; // { '漢字': { contexts: Set, count: number, isJinmei: boolean } }
-             const contextPadding = 15;
-             let match;
-
-             if (typeof joyoKanji === 'undefined') {
+             if (typeof JOYO_KANJI_SET === 'undefined' || typeof normalizeKanjiText !== 'function') {
                  document.getElementById("errorMsg").textContent = "常用漢字リスト(kanji_data.js)が見つかりません。";
                  return;
              }
+
+             // PDF 由来の部首用文字コード（⻑ など）や全角英数は通常の文字へ寄せる。
+             // 旧字体などの互換漢字は常用漢字と同じ字ではないので、寄せずに残して指摘する
+             text = normalizeKanjiText(text, { keepCompat: true });
+             const kanjiRegex = /\p{Script=Han}/gu;
+             // { '漢字': { contexts: Set, count: number, isJinmei: boolean, variantOf: string|null } }
+             const results = {};
+             const contextPadding = 15;
+             let match;
 
              while ((match = kanjiRegex.exec(text)) !== null) {
                  const char = match[0];
                  const index = match.index;
 
-                 const isJoyo = joyoKanji.includes(char);
-                 const isHouseRule = typeof houseRules !== 'undefined' && houseRules.includes(char);
-
-                 // 常用漢字でもハウスルールでもない場合のみ処理する
-                 if (!isJoyo && !isHouseRule) {
+                 // 常用漢字（表の字体 4 字・ハウスルールを含む）でない場合のみ処理する
+                 if (!JOYO_KANJI_SET.has(char)) {
                      const start = Math.max(0, index - contextPadding);
                      const end = Math.min(text.length, index + contextPadding + 1);
                      const context = text.substring(start, end);
@@ -578,8 +636,15 @@ lang: ja
                          results[char] = {
                              contexts: new Set(),
                              count: 0,
-                             isJinmei: false
+                             isJinmei: false,
+                             variantOf: null
                          };
+
+                         // 常用漢字の旧字体・異体字（互換漢字）なら、対応する常用漢字を控える
+                         const base = compatIdeographBase(char);
+                         if (base && JOYO_KANJI_SET.has(base)) {
+                             results[char].variantOf = base;
+                         }
 
                          // 人名用漢字リストに含まれているか判定
                          // (jinmei-kanji-data.js の isJinmeiyoKanji 関数を使用)
@@ -632,11 +697,12 @@ lang: ja
 
             // 集計行（字数・人名用・出現回数）とコピーボタン
             const jinmeiCount = kanjis.filter(k => results[k].isJinmei).length;
+            const variantCount = kanjis.filter(k => results[k].variantOf).length;
             const totalCount = kanjis.reduce((sum, k) => sum + results[k].count, 0);
             resultArea.innerHTML = `
                 <div class="summary">
                     <p class="summary-text">表外漢字 <strong>${kanjis.length}</strong> 字
-                        <span class="summary-sub">うち人名用漢字 ${jinmeiCount} 字・出現 ${totalCount} 回</span></p>
+                        <span class="summary-sub">うち人名用漢字 ${jinmeiCount} 字・常用漢字の旧字体など ${variantCount} 字・出現 ${totalCount} 回</span></p>
                     <button type="button" class="copy-btn" id="copyBtn">検出漢字をコピー</button>
                     <button type="button" class="print-btn" onclick="window.print()">印刷</button>
                 </div>`;
@@ -677,6 +743,14 @@ lang: ja
                     tagSpan.className = "badge badge-jinmei";
                     tagSpan.textContent = "人名用漢字";
                     header.appendChild(tagSpan);
+                }
+
+                // 3b. 常用漢字の旧字体・異体字タグ
+                if (kanjiData.variantOf) {
+                    const variantSpan = document.createElement("span");
+                    variantSpan.className = "badge badge-variant";
+                    variantSpan.textContent = `常用漢字「${kanjiData.variantOf}」の旧字体・異体字`;
+                    header.appendChild(variantSpan);
                 }
 
                 // 4. 報告ボタン

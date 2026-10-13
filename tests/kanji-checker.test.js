@@ -7,9 +7,9 @@ function analyzer() {
   const out = {};
   const errorMsg = { textContent: '' };
   const api = load({
-    files: ['kanji_data.js', 'jinmei-kanji-data.js'],
+    files: ['kanji-normalize.js', 'kanji_data.js', 'jinmei-kanji-data.js'],
     functions: ['analyzeKanji', 'escapeHTML'],
-    exports: ['joyoKanji', 'houseRules', 'JINMEI_KANJI_LIST', 'isJinmeiyoKanji'],
+    exports: ['joyoKanji', 'joyoKanjiTableForms', 'houseRules', 'JINMEI_KANJI_LIST', 'isJinmeiyoKanji', 'CJK_RADICAL_TO_UNIFIED', 'normalizeKanjiText'],
     globals: {
       renderResults: (r) => { out.results = r; },
       document: { getElementById: () => errorMsg },
@@ -26,9 +26,10 @@ test('常用漢字データは README の記載どおり 2,136 字で重複が�
   assert.ok(chars.every((c) => /\p{Script=Han}/u.test(c)), '漢字以外の文字が含まれている');
 });
 
-test('人名用漢字データは告示どおり 863 字で、互換漢字 57 字以外は常用漢字と重複しない', () => {
+test('人名用漢字データは 864 字（2026 年 6 月追加の「勒」を含む）で、互換漢字 57 字以外は常用漢字と重複しない', () => {
   const { JINMEI_KANJI_LIST, joyoKanji } = analyzer();
-  assert.equal(JINMEI_KANJI_LIST.length, 863);
+  assert.equal(JINMEI_KANJI_LIST.length, 864);
+  assert.ok(JINMEI_KANJI_LIST.includes('勒'));
   const compat = JINMEI_KANJI_LIST.filter((c) => c.normalize('NFC') !== c);
   assert.equal(compat.length, 57, '互換漢字が正規化で失われていないか');
   const overlap = JINMEI_KANJI_LIST.filter((c) => c.normalize('NFC') === c && joyoKanji.includes(c));
@@ -57,10 +58,44 @@ test('人名用漢字には isJinmei が付く', () => {
   assert.equal(r['薔'].isJinmei, false);
 });
 
-test('ハウスルールの文字は検出しない', () => {
-  const { run, houseRules } = analyzer();
-  assert.ok(houseRules.length > 0);
-  assert.equal(Object.keys(run(houseRules)).length, 0);
+test('常用漢字表の字体（塡・剝・頰・𠮟）も、機器で使われる字体（填・剥・頬・叱）も常用漢字として扱う', () => {
+  const { run, joyoKanjiTableForms } = analyzer();
+  assert.deepEqual(Array.from(joyoKanjiTableForms).map((c) => c.codePointAt(0).toString(16)), ['5861', '525d', '9830', '20b9f']);
+  assert.equal(Object.keys(run('塡剝頰\u{20B9F}填剥頬叱')).length, 0);
+});
+
+test('PDF 由来の部首用文字コードは通常の漢字として判定する（表外字にしない）', () => {
+  const { run, CJK_RADICAL_TO_UNIFIED } = analyzer();
+  // U+2ED1 ⻑→長、U+2EA0 ⺠→民（CJK 部首補助）、U+2F00 ⼀→一（康熙部首）
+  assert.equal(CJK_RADICAL_TO_UNIFIED.get('\u2ED1'), '長');
+  assert.equal(CJK_RADICAL_TO_UNIFIED.get('\u2EA0'), '民');
+  assert.equal(CJK_RADICAL_TO_UNIFIED.size, 114);
+  assert.equal(Object.keys(run('\u2ED1\u2EA0\u2F00\u2ED8\u2EC4\u2EDD')).length, 0);
+  // 対応先が常用漢字でない部首（⻤→鬼 は常用、⺾→艹 は表外）は対応先の字で指摘する
+  assert.deepEqual(Object.keys(run('\u2EBE')), ['艹']);
+});
+
+test('常用漢字の旧字体（互換漢字）は見逃さず、対応する常用漢字つきで指摘する', () => {
+  const { run } = analyzer();
+  const r = run('\u{FA19}社と神社'); // U+FA19 は「神」の旧字体
+  assert.deepEqual(Object.keys(r), ['\u{FA19}']);
+  assert.equal(r['\u{FA19}'].variantOf, '神');
+  assert.equal(r['\u{FA19}'].isJinmei, true);
+  assert.equal(r['\u{FA19}'].count, 1);
+  // 互換漢字でない表外字には付かない
+  assert.equal(run('薔')['薔'].variantOf, null);
+});
+
+test('全角英数や合字は正規化しても、漢字の判定結果は変わらない', () => {
+  const { run } = analyzer();
+  assert.equal(Object.keys(run('ＡＢＣ１２３㈱')).length, 0);
+});
+
+test('ハウスルールに登録した文字は検出しない', () => {
+  const { houseRules } = analyzer();
+  assert.equal(typeof houseRules, 'string');
+  const html = read('kanji_data.js');
+  assert.match(html, /new Set\(joyoKanji \+ joyoKanjiTableForms \+ houseRules\)/);
 });
 
 test('漢字が 1 つもない文章では 0 件になる', () => {
