@@ -1,5 +1,10 @@
 # 進捗: 常用漢字さん（kanji-checker）
 
+## 2026-10-21 セッション（エージェント向け規則の一本化）
+
+- `CLAUDE.md` と `AGENTS.md` に規則が別々に書かれ、内容がずれていた（Claude Code は `CLAUDE.md` があると `AGENTS.md` を自動では読まず、Codex は `CLAUDE.md` を読まない）。両方の規則を `AGENTS.md` に統合し、`CLAUDE.md` は `@AGENTS.md` の取り込みだけにした。
+- org 共通の取り決めと検査は edi-tool/.github#1（`PRINCIPLES.md`・`templates/CLAUDE.template.md`・`tools/check-template-sync.mjs`）。
+
 ## 2026-10-13 セッション（判定精度の見直し）
 
 先行データ・ツールの状況を確認して反映した（pdfjs-dist 6.4.299 / mammoth 1.13.0 が最新。textlint-rule-ja-joyo-or-jinmeiyo-kanji は 2022 年から更新なし）。
