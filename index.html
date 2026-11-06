@@ -484,6 +484,16 @@ lang: ja
 footer a[href="https://edi-tool.github.io/"] { display: inline-flex; align-items: center; min-height: 44px; }
 :root { --et-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E"); }
 .et-live { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* edi-tool 共通: ツールの説明（検索で見つけてもらうための本文） */
+.et-about { max-width: 48rem; margin: 3rem auto 0; padding: 1.5rem 1rem 0; border-top: 1px solid var(--border); color: var(--text); font-size: 0.9375rem; line-height: 1.8; text-align: left; }
+.et-about h2 { font-size: 1.0625rem; font-weight: 700; line-height: 1.5; margin: 1.75rem 0 0.5rem; color: var(--text); }
+.et-about h2:first-child { margin-top: 0; }
+.et-about p, .et-about ol, .et-about dl { margin: 0.25rem 0 0.75rem; color: var(--text-sub); }
+.et-about ol { list-style: decimal; padding-left: 1.5em; }
+.et-about li { margin: 0.125rem 0; }
+.et-about dt { font-weight: 700; margin-top: 0.75rem; color: var(--text); }
+.et-about dd { margin: 0.125rem 0 0; }
     </style>
     <script type="application/ld+json">
       {
@@ -565,6 +575,26 @@ footer a[href="https://edi-tool.github.io/"] { display: inline-flex; align-items
             <p class="placeholder-text">ファイルを読み込むか文章を貼り付けると、検出された表外漢字と文脈が表示されます。</p>
         </div>
     </div>
+
+    <section class="et-about" aria-labelledby="et-about-h">
+        <h2 id="et-about-h">常用漢字さんでできること</h2>
+        <p>原稿や資料の中から、常用漢字表（2,136字）にない漢字＝表外漢字を見つける無料ツールです。PDF・Word（.docx）・テキストを読み込むか文章を貼り付けると、表外漢字を出現回数と前後の文脈つきで一覧にします。人名用漢字や、常用漢字の旧字体・異体字には印が付きます。原稿の表記チェックや校正の補助に使えます。</p>
+        <h2>使い方</h2>
+        <ol>
+            <li>ファイルを選ぶか、「文章を貼り付けて判定する」から文章を貼り付けます。</li>
+            <li>表外漢字が、出現回数・前後の文脈とともに一覧表示されます。</li>
+            <li>常用漢字なのに検出された字は、「誤検知を報告」から知らせられます。</li>
+        </ol>
+        <h2>よくある質問</h2>
+        <dl>
+            <dt>判定の基準は何ですか？</dt>
+            <dd>文化庁「常用漢字表」（平成22年内閣告示第2号）の 2,136 字です。人名用漢字は、戸籍法施行規則 別表第二をもとに判別します。</dd>
+            <dt>スキャンした PDF も判定できますか？</dt>
+            <dd>文字の情報がない PDF（画像だけの PDF など）は文字を取り出せないため判定できません。その場合は「テキストを取り出せませんでした」と表示し、「該当なし」とはしません。</dd>
+            <dt>ファイルはアップロードされますか？</dt>
+            <dd>されません。解析はブラウザ内で行います。「誤検知を報告」を押して確認したときだけ、その字と文脈の一部を送ります。</dd>
+        </dl>
+    </section>
 
     <footer>
         <a href="https://edi-tool.github.io/"><span class="et-i et-i-chevron-left" aria-hidden="true"></span>edi-tool ツール一覧</a> | &copy; 2026 ISHIKAWA, Natsuki | MIT License
